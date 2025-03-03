@@ -1,175 +1,94 @@
-// ===== DETAIL COMPETITION (CHANGE CONTENT) ===== //
-document.addEventListener('DOMContentLoaded', () => {
-    const swiperSlides = document.querySelectorAll('.swiper-slide');
-    const detailSection = document.querySelector('.show-hide-detail-competition');
-    const detailTitle = detailSection.querySelector('h1');
-    const detailContent = detailSection.querySelector('p');
-    const detailImage = detailSection.querySelector('.right .img');
+// ===== COUNTDOWN OF EVENT FUNCTION ===== //
+const targetDate = new Date("May 1, 2025 00:00:00").getTime();
 
-    detailSection.style.display = 'none';
+function updateCountdown() {
+    const now = new Date().getTime();
+    const timeLeft = targetDate - now;
 
-    let currentSlide = null;
-
-    swiperSlides.forEach(slide => {
-        slide.addEventListener('click', () => {
-            if (currentSlide === slide) {
-                detailSection.style.display = 'none';
-                currentSlide = null;
-            } else {
-                const title = slide.getAttribute('data-title');
-                const content = slide.getAttribute('data-content');
-                const background = slide.getAttribute('data-background');
-                const image = slide.getAttribute('data-image');
-
-                detailTitle.textContent = title;
-                detailContent.textContent = content;
-                detailImage.style.backgroundImage = `url(${image})`;
-                detailSection.style.backgroundImage = `url(${background})`;
-
-                detailSection.style.display = 'block';
-                detailSection.scrollIntoView({ behavior: 'smooth' });
-                currentSlide = slide;
-            }
-        });
-    });
-});
-
-// Ambil elemen burger menu dan nav-links
-const burgerMenu = document.querySelector(".burger-menu");
-const navLinksBurger = document.querySelector(".nav-links");
-
-// Tambahkan event listener untuk toggle menu
-burgerMenu.addEventListener("click", () => {
-    navLinksBurger.classList.toggle("active"); // Tambah/hapus class active pada menu
-    burgerMenu.classList.toggle("active"); // Tambah/hapus animasi burger
-});
-
-// ===== SCROLL BAR FUNCTION ===== //
-window.addEventListener('scroll', () => {
-    const navbar = document.querySelector('.nav-container');
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
+    if (timeLeft <= 0) {
+        document.getElementById("countdown").innerHTML = "00:00:00";
+        clearInterval(countdownInterval);
+        return;
     }
-});
 
-// ===== ACTIVE NAVBAR ===== //
-const sections = document.querySelectorAll('section');
-const navLinks = document.querySelectorAll('.nav-links a');
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (window.scrollY >= sectionTop - sectionHeight / 3) {
-            current = section.getAttribute('id');
-        }
-    });
+    document.getElementById("countdown").innerHTML =
+        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+const countdownInterval = setInterval(updateCountdown, 1000);
+updateCountdown();
 
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
-});
-
-// ===== SLIDER ===== //
+// ===== SWIPER ABOUT ===== //
 var swiper = new Swiper(".mySwiper", {
-    slidesPerView: 1,
+    slidesPerView: 3,
+    spaceBetween: 20,
+    loop: true,
+    centeredSlides: true,
+    speed: 2000,
+
+    effect: "coverflow",
+    coverflowEffect: {
+        rotate: 40,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: true,
+    },
+
+    autoplay: {
+        delay: 2000,
+        disableOnInteraction: false,
+    },
+});
+
+// ===== SWIPER COMPETITION ===== //
+var competitionSwiper = new Swiper(".swiper-competition", {
+    slidesPerView: 2,
     spaceBetween: 10,
+    loop: true,
+    speed: 1000,
+
+    autoplay: {
+        delay: 2000,
+        disableOnInteraction: false,
+    },
     navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
+        nextEl: ".competition-next",
+        prevEl: ".competition-prev",
     },
     pagination: {
-        el: ".swiper-pagination",
+        el: ".competition-pagination",
         clickable: true,
     },
-    breakpoints: {
-        768: {
-            slidesPerView: 3,
-            spaceBetween: 20,
-        },
+});
+
+// ===== SWIPER SPONSORS 1 ===== //
+var sponsorsSwiper = new Swiper(".swiper-sponsors", {
+    slidesPerView: 3,
+    spaceBetween: 10,
+    loop: true,
+    speed: 5000,
+    freeMode: true,
+    autoplay: {
+        delay: 0,
+        disableOnInteraction: false,
     },
 });
 
-// Filter Function
-const buttons = document.querySelectorAll(".btn button");
-const swiperWrapper = document.querySelector(".swiper-wrapper");
-const allSlides = Array.from(swiperWrapper.children);
-
-buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-        const filter = button.textContent.trim().toUpperCase();
-        swiperWrapper.innerHTML = "";
-        const filteredSlides = allSlides.filter((slide) => {
-            const badge = slide.querySelector(".badge, .badge-hotelier").textContent.trim().toUpperCase();
-            return badge === filter;
-        });
-        filteredSlides.forEach((slide) => swiperWrapper.appendChild(slide));
-        swiper.update();
-    });
-});
-
-// ===== DROPDOWN RANK (MOBILE) ===== //
-const ranks = document.querySelectorAll(".champion-prize-rank");
-
-ranks.forEach((rank) => {
-    const top = rank.querySelector(".top");
-    const bottom = rank.querySelector(".bottom");
-
-    top.addEventListener("click", () => {
-        if (bottom.style.height === "50px") {
-            bottom.style.height = "0";
-        } else {
-            bottom.style.height = "50px";
-        }
-    });
-});
-
-// ===== TIMELINE ===== //
-const modal = document.getElementById("timelineModal");
-const openModalBtn = document.querySelector(".open-timeline-btn");
-const closeModalBtn = document.getElementById("closeModal");
-
-openModalBtn.addEventListener("click", () => {
-    modal.style.display = "flex";
-});
-
-closeModalBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-});
-
-window.addEventListener("click", (event) => {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-});
-
-const lockScroll = () => {
-    document.body.style.overflow = "hidden";
-};
-
-const unlockScroll = () => {
-    document.body.style.overflow = "auto";
-};
-
-openModalBtn.addEventListener("click", () => {
-    modal.style.display = "flex";
-    lockScroll();
-});
-
-closeModalBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-    unlockScroll();
-});
-
-window.addEventListener("click", (event) => {
-    if (event.target === modal) {
-        modal.style.display = "none";
-        unlockScroll();
-    }
+// ===== SWIPER SPONSORS 2 ===== //
+var sponsors2Swiper = new Swiper(".swiper-sponsors2", {
+    slidesPerView: 3,
+    spaceBetween: 10,
+    loop: true,
+    speed: 5000,
+    freeMode: true,
+    autoplay: {
+        delay: 0,
+        disableOnInteraction: false,
+        reverseDirection: true,
+    },
 });
